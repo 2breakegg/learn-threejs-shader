@@ -27,17 +27,26 @@ module.exports={
                     },
                 ]
             },
+            {
+                test: [/\.glsl$/i,/\.vert$/i,/\.frag$/i],
+                use: 'raw-loader',
+            },
         ]
     },
 
     devServer: {
         contentBase: path.join(__dirname, "dist"),
         compress: true,
-        port: 3001,
+        port: 3003,
         open:true,
         openPage:'mycode/'
     },
-
+    watch:true,
+    watchOptions:{
+        poll:1000, //每秒 问我1000次
+        aggregateTimeout:300, //防抖 我一直输入代码
+        ignored:/node_modules/ // 不需要进行监控哪个文件
+    },
     plugins: 
     myWebpackFunction.getHtmlWebPackPlugin2(),
 

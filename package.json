@@ -1,11 +1,12 @@
 {
-  "name": "threejs_webpack_typescript",
+  "name": "threejs_webpack_ts_shader",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "dev": "webpack-dev-server"
+    "dev": "webpack-dev-server",
+    "live-server": "live-server"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
     "awesome-typescript-loader": "^5.2.1",
     "expose-loader": "^0.7.5",
     "html-webpack-plugin": "^3.2.0",
+    "raw-loader": "^3.1.0",
     "three": "^0.106.2",
     "typescript": "^3.5.3",
     "webpack": "^4.35.3",
