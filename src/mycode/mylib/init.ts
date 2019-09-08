@@ -1,6 +1,7 @@
-import * as THREE from "three";
+import * as THREE from "../../files/three/src/Three";
+import {OrbitControls} from "../../files/jsm/controls/OrbitControls";
 import EventFunctions from "./eventfunctions";
-import Stats from "../jsm/libs/stats.module";
+import Stats from "../../files/jsm/libs/stats.module";
 import log from "./log";
 
 let scene = new THREE.Scene(); // 创建场景
@@ -36,7 +37,7 @@ window.onresize = (): void => {
 };
 
 export {
-    THREE,
+    THREE, OrbitControls,
     scene, camera, renderer,
     animateFunctions, log,
 };

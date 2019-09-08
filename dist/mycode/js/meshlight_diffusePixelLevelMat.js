@@ -49359,10 +49359,10 @@ function LensFlare() {
 
 /***/ }),
 
-/***/ "./src/mycode/jsm/controls/OrbitControls.js":
-/*!**************************************************!*\
-  !*** ./src/mycode/jsm/controls/OrbitControls.js ***!
-  \**************************************************/
+/***/ "./src/files/jsm/controls/OrbitControls.js":
+/*!*************************************************!*\
+  !*** ./src/files/jsm/controls/OrbitControls.js ***!
+  \*************************************************/
 /*! exports provided: OrbitControls */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -50448,10 +50448,10 @@ Object.defineProperties( OrbitControls.prototype, {
 
 /***/ }),
 
-/***/ "./src/mycode/jsm/libs/stats.module.js":
-/*!*********************************************!*\
-  !*** ./src/mycode/jsm/libs/stats.module.js ***!
-  \*********************************************/
+/***/ "./src/files/jsm/libs/stats.module.js":
+/*!********************************************!*\
+  !*** ./src/files/jsm/libs/stats.module.js ***!
+  \********************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -50657,12 +50657,11 @@ __webpack_require__.r(__webpack_exports__);
 Object.defineProperty(exports, "__esModule", { value: true });
 var init_1 = __webpack_require__(/*! ../mylib/init */ "./src/mycode/mylib/init.ts");
 var THREE = __webpack_require__(/*! three */ "three");
-var OrbitControls_1 = __webpack_require__(/*! ../jsm/controls/OrbitControls */ "./src/mycode/jsm/controls/OrbitControls.js");
 var initshader_1 = __webpack_require__(/*! ../mylib/initshader */ "./src/mycode/mylib/initshader.ts");
 var meshlight_diffusePixelLevelMat_glsl_1 = __webpack_require__(/*! ./meshlight_diffusePixelLevelMat.glsl */ "./src/mycode/meshlight/meshlight_diffusePixelLevelMat.glsl");
 // import shaderVertex from "./Phong.vert";
 // import shaderFragment from "./Phong.frag";
-var control = new OrbitControls_1.OrbitControls(init_1.camera, init_1.renderer.domElement);
+var control = new init_1.OrbitControls(init_1.camera, init_1.renderer.domElement);
 var mesh;
 var light;
 var shaderVertex = initshader_1.initShader.getShader(meshlight_diffusePixelLevelMat_glsl_1.default, initshader_1.shaderType.vertex);
@@ -50778,8 +50777,10 @@ exports.default = EventFunctions;
 Object.defineProperty(exports, "__esModule", { value: true });
 var THREE = __webpack_require__(/*! three */ "three");
 exports.THREE = THREE;
+var OrbitControls_1 = __webpack_require__(/*! ../../files/jsm/controls/OrbitControls */ "./src/files/jsm/controls/OrbitControls.js");
+exports.OrbitControls = OrbitControls_1.OrbitControls;
 var eventfunctions_1 = __webpack_require__(/*! ./eventfunctions */ "./src/mycode/mylib/eventfunctions.ts");
-var stats_module_1 = __webpack_require__(/*! ../jsm/libs/stats.module */ "./src/mycode/jsm/libs/stats.module.js");
+var stats_module_1 = __webpack_require__(/*! ../../files/jsm/libs/stats.module */ "./src/files/jsm/libs/stats.module.js");
 var log_1 = __webpack_require__(/*! ./log */ "./src/mycode/mylib/log.ts");
 exports.log = log_1.default;
 var scene = new THREE.Scene(); // 创建场景

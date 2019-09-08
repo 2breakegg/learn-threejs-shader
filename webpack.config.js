@@ -20,6 +20,10 @@ module.exports={
     module:{
         rules:[
             {
+                test:/\.(png|jpg|gif)$/,
+                use:'file-loader'
+            },
+            {
                 test: /\.ts$/,
                 use:[
                     {
@@ -27,6 +31,7 @@ module.exports={
                     },
                 ]
             },
+
             {
                 test: [/\.glsl$/i,/\.vert$/i,/\.frag$/i],
                 use: 'raw-loader',
@@ -51,6 +56,6 @@ module.exports={
     myWebpackFunction.getHtmlWebPackPlugin2(),
 
     externals:{
-        three:"THREE"
+        three:"../../files/three/src/Three"
     }
 };

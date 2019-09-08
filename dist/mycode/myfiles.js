@@ -14,5 +14,9 @@ var files = {
         "meshlight_diffuse_ambient",
         "meshlight_HalfLambert",
         "meshlight_Phong"
+    ],
+    "postprocessing/": [
+        "postprocessing_brightnessSaturationContrast",
+        "postprocessing_test"
     ]
 }
