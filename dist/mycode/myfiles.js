@@ -17,6 +17,7 @@ var files = {
     ],
     "postprocessing/": [
         "postprocessing_brightnessSaturationContrast",
+        "postprocessing_EdgeDetection",
         "postprocessing_test"
     ]
 }
