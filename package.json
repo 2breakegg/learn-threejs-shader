@@ -6,7 +6,9 @@
   "scripts": {
     "build": "webpack",
     "dev": "webpack-dev-server",
-    "live-server": "live-server"
+    "live-server": "live-server",
+    "show-folder": "node ./.vscode/changeSetting.js",
+    "hidden-folder": "node ./.vscode/changeSetting.js -h"
   },
   "keywords": [],
   "author": "",
