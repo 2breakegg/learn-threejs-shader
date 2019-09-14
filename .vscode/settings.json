@@ -8,5 +8,5 @@
         "package.json": false,
         "node_modules": true
     },
-    "workbench.colorTheme": "Visual Studio Light"
+    "workbench.colorTheme": "Red"
 }
