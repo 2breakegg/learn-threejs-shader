@@ -46,7 +46,7 @@ module.exports={
         open:true,
         openPage:'mycode/'
     },
-    watch:true,
+    watch:false,
     watchOptions:{
         poll:1000, //每秒 问我1000次
         aggregateTimeout:300, //防抖 我一直输入代码

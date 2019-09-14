@@ -30,9 +30,9 @@ float Sobel(vec4 pos, vec2 uv[9]){
     Gx[6]= 1.; Gx[7]= 2.; Gx[8]= 1.;
 
     float Gy[9];
-    Gy[0]=-1.; Gy[0]= 0.; Gy[0]= 1.;
-    Gy[0]=-2.; Gy[0]= 0.; Gy[0]= 2.;
-    Gy[0]=-1.; Gy[0]= 0.; Gy[0]= 1.;
+    Gy[0]=-1.; Gy[1]= 0.; Gy[2]= 1.;
+    Gy[3]=-2.; Gy[4]= 0.; Gy[5]= 2.;
+    Gy[6]=-1.; Gy[7]= 0.; Gy[8]= 1.;
 
     float texColor;
     float edgeX = 0.;
@@ -55,5 +55,7 @@ void main() {
     vec4 onlyEdgeColor = mix(vec4(_EdgeColor,1.), vec4(_BackgroundColor,1.), edge);
 
     gl_FragColor = mix(withEdgeColor, onlyEdgeColor, _EdgeOnly);
+    // gl_FragColor = withEdgeColor;
+    // gl_FragColor = onlyEdgeColor;
     // gl_FragColor = texture2D(tDiffuse, vUv[4]);
 }

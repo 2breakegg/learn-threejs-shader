@@ -1,6 +1,12 @@
 {
     "files.exclude": {
-        "*.*": true,
+        "package-lock.json": true,
+        ".gitignore":true,
+        "readme.md":true,
+        "tsconfig.json":true,
+        "webpack.config.js":true,
+        "package.json": false,
         "node_modules": true
-    }
+    },
+    "workbench.colorTheme": "Visual Studio Light"
 }

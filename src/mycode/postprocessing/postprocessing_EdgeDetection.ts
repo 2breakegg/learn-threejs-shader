@@ -1,8 +1,8 @@
 import {THREE, log, 
-    renderer, scene, camera, 
+    initRenderer, scene, camera, 
     OrbitControls, stats,
     EffectComposer,RenderPass,ShaderPass,
-    initShader, shaderType} from "../mylib/init_three.modle";
+    initShader, shaderType} from "../mylib/init_comtrast_three.modle";
 
 import EdgeDetection__vert from '../glsl/postprocessing/EdgeDetection.vert';
 import EdgeDetection__frag from '../glsl/postprocessing/EdgeDetection.frag';
@@ -11,6 +11,9 @@ import { GUI } from '../../files/three/examples/jsm/libs/dat.gui.module.new';
 import flower_png from './flower.png';
 let EdgeDetection, effect:ShaderPass, composer: EffectComposer;
 let sprite: THREE.Sprite;
+let renderers = initRenderer();
+let renderer = renderers[0];
+let renderer2 = renderers[1];
 
 function init() {
     camera.position.z = 5;
@@ -25,8 +28,8 @@ function init() {
         img.src = flower_png;
         img.onload = function(){
             sprite.scale.x = img.width/img.height;
-            effect.uniforms._MainTex_TexelSize.value.x = 1/img.width;
-            effect.uniforms._MainTex_TexelSize.value.y = 1/img.height;
+            // effect.uniforms._MainTex_TexelSize.value.x = 1/img.width;
+            // effect.uniforms._MainTex_TexelSize.value.y = 1/img.height;
         }
         let spriteMap = new THREE.TextureLoader().load(flower_png);
         let spriteMaterial = new THREE.SpriteMaterial({map:spriteMap, color: 0xffffff});
@@ -44,8 +47,8 @@ function init() {
         EdgeDetection = {
             uniforms: {
                 "tDiffuse": { value: null } as aa,
-                "_MainTex_TexelSize":    { value: new THREE.Vector4(1/100, 1/100, 0., 0.) },
-                "_EdgeOnly":   { value: 1. },
+                "_MainTex_TexelSize":    { value: new THREE.Vector4(1/500, 1/500, 0., 0.) },
+                "_EdgeOnly":   { value: 0.1 },
                 "_EdgeColor":    { value: new THREE.Color(0, 0, 0) },
                 "_BackgroundColor":    { value: new THREE.Color(1, 1, 1) },
             },
@@ -58,8 +61,8 @@ function init() {
     }
     function createGUI(){
         let Configuration = {
-            _MainTex_TexelSize_x : 100,
-            _MainTex_TexelSize_y : 100,
+            _MainTex_TexelSize_x : 500,
+            _MainTex_TexelSize_y : 500,
             _EdgeColor : `#000000`,
             _BackgroundColor : `#ffffff`
         }
@@ -85,6 +88,7 @@ function animate(){
     requestAnimationFrame(animate);
     // renderer.render(scene,camera);
     composer.render();
+    renderer2.render(scene,camera);
     stats.update();
 }
 
