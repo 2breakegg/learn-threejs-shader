@@ -1,0 +1,180 @@
+import {THREE,OrbitControls} from "../mylib/init_comtrast_three.modle";
+import bloom2_vert from "../glsl/postprocessing/Bloom2.vert";
+import bloom2_frag from "../glsl/postprocessing/Bloom2.frag";
+import getHighLight_vert from "../glsl/postprocessing/getHighLight.vert";
+import getHighLight_frag from "../glsl/postprocessing/getHighLight.frag";
+
+let scene = new THREE.Scene();
+let camera = new THREE.OrthographicCamera( window.innerWidth/-2, 
+    window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 1, 10000);
+let renderer = new THREE.WebGLRenderer();
+let sceneA:SceneA, scenePlanes = Array<ScenePlane>(), sceneHighLight: SceneHighLight;
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+camera.position.z = 1000;
+document.body.appendChild(renderer.domElement);
+
+// 原场景,原相机
+class SceneA{
+    scene: THREE.Scene;
+    camera: THREE.PerspectiveCamera;
+    cube: THREE.Group;
+    fbo: THREE.WebGLRenderTarget;
+    render: ()=>void;
+    constructor(){
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+        this.camera.position.z = 5;
+        this.cube = new THREE.Group();
+        // this.cube.add(
+            // new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshBasicMaterial({color:0xff0000})));
+        this.cube.add(
+            new THREE.LineSegments(
+                new THREE.WireframeGeometry(new THREE.BoxGeometry(1,1,1)), 
+                new THREE.LineBasicMaterial({color: 0xffff00})
+            ));
+
+        this.scene.add(this.cube);
+
+        var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+        this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
+
+        this.render = function(){
+            // this.cube.rotation.x += 0.01;
+            // this.cube.rotation.y += 0.01;
+
+            renderer.setRenderTarget( this.fbo );
+            renderer.clear();
+            renderer.render( this.scene, this.camera );
+        }
+    }
+}
+// 用不来TS, 勉强防报错
+interface aa {
+    value:any
+}
+// 进行多次泛光,模糊操作用的场景, 
+// 由于需要水平模糊和数值模糊, 在数组scenePlanes 中 下标偶数为水平模糊, 下标奇数垂直模糊
+class ScenePlane{
+    scene: THREE.Scene;
+    camera: THREE.OrthographicCamera;
+    plane: THREE.Mesh;
+    fbo: THREE.WebGLRenderTarget;
+    render: ()=>void;
+    /**
+     * @param otherFbo : THREE.WebGLRenderTarget  | null
+     * @param highLightFbo : highLightFbo
+     * @param direction : boolean true 为水平, false 为垂直
+     * @param isLast : boolean 判断是否是最后一次渲染, 最后次渲染要渲染到屏幕上
+     */
+    constructor(otherFbo: THREE.WebGLRenderTarget | null, highLightFbo:  THREE.WebGLRenderTarget, direction: boolean, isLast: boolean){ 
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.OrthographicCamera( window.innerWidth/-2, 
+            window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 1, 10000);
+        this.camera.position.z = 5;
+        this.plane = new THREE.Mesh(
+            new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight), 
+            new THREE.ShaderMaterial({
+                uniforms: {
+                    "tDiffuse": { value: otherFbo.texture },
+                    "tDiffuse2": { value: highLightFbo.texture},
+                    "_MainTex_TexelSize":    { value: 
+                        direction ? new THREE.Vector4(1/1000, 0, 0., 0.) : new THREE.Vector4(0, 1/1000, 0., 0.) },
+                    "_BlurSize":   { value: 1.0 },
+                    "_Threshold": {value: 0.6},
+                },
+                vertexShader: bloom2_vert,
+                fragmentShader: bloom2_frag,
+            })
+        );
+
+        this.scene.add(this.plane);
+
+        var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+        this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
+
+        this.render = function(){
+            if(isLast){
+                renderer.setRenderTarget( null );
+            }else{
+                renderer.setRenderTarget( this.fbo );
+            }
+            
+            renderer.clear();
+            renderer.render( this.scene, this.camera );
+        }
+    }
+}
+// 用来获取高光部分的场景
+class SceneHighLight{
+    scene: THREE.Scene;
+    camera: THREE.OrthographicCamera;
+    plane: THREE.Mesh;
+    fbo: THREE.WebGLRenderTarget;
+    render: ()=>void;
+    constructor(otherFbo:THREE.WebGLRenderTarget){
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.OrthographicCamera( window.innerWidth/-2, 
+            window.innerWidth/2, window.innerHeight/2, window.innerHeight/-2, 1, 10000);
+        this.camera.position.z = 5;
+        this.plane = new THREE.Mesh(
+            new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight), 
+            new THREE.ShaderMaterial({
+                uniforms: {
+                    "tDiffuse": { value: otherFbo.texture },// as aa,
+                    "_Threshold": {value: 0.6},
+                },
+                vertexShader: getHighLight_vert,
+                fragmentShader: getHighLight_frag,
+            })
+        );
+
+        this.scene.add(this.plane);
+
+        var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+        this.fbo = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters );
+
+        this.render = function(){
+            // renderer.setRenderTarget( null );
+            renderer.setRenderTarget( this.fbo );
+            renderer.clear();
+            renderer.render( this.scene, this.camera );
+        }
+    }
+}
+
+function init(){
+    let renderNum = 10; // 渲染次数
+    let fbo: THREE.WebGLRenderTarget; // 类似于迭代器, 存储上一次渲染到哪个 fbo了
+    sceneA = new SceneA();
+    sceneHighLight = new SceneHighLight(sceneA.fbo);
+    fbo = sceneA.fbo;
+    for(var i = 0; i <= renderNum; i++){
+        let direction = (i % 2 == 0); 
+        let isLast = i == renderNum;
+        // let scenePlane = new ScenePlane(thisfbo, sceneHighLight.fbo, direction);
+        let scenePlane = new ScenePlane(fbo, sceneHighLight.fbo, direction, isLast);
+        fbo = scenePlane.fbo;
+        scenePlanes.push(scenePlane);
+    }
+
+    let control = new OrbitControls(sceneA.camera, renderer.domElement);
+}
+
+function animate(){
+    requestAnimationFrame(animate);
+
+    sceneA.render();
+    sceneHighLight.render();
+    for(let i = 0; i < scenePlanes.length; i++){
+        scenePlanes[i].render();
+    }
+
+    // renderer.setRenderTarget( null );
+    // renderer.setClearColor(new THREE.Color(0x000000));
+    // renderer.clear();
+    // renderer.render(scene, camera);
+}
+
+init();
+animate();

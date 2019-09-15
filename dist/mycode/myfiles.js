@@ -24,6 +24,6 @@ var files = {
         "postprocessing_test"
     ],
     "coding/": [
-        "postprocessing_0RenderTarget"
+        "coding_postprocessing_Bloom1"
     ]
 }
