@@ -13,5 +13,5 @@
         "webpack.config.js": true,
         ".vscode": true
     },
-    "workbench.colorTheme": "Visual Studio Light"
+    "workbench.colorTheme": "Kimbie Dark"
 }
