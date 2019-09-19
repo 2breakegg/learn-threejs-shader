@@ -9,8 +9,8 @@ let dirArr=[
     // 'a/',
     // 'mesh/',
     // 'meshlight/',
-    // 'postprocessing/',
-    'coding/'
+    'postprocessing/',
+    // 'coding/'
 ];
 
 module.exports={

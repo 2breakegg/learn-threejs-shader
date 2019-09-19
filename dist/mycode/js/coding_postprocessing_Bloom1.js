@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/mycode/postprocessing/postprocessing_0RenderTarget.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/mycode/postprocessing/coding_postprocessing_Bloom1.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -51401,6 +51401,84 @@ var CopyShader = {
 
 /***/ }),
 
+/***/ "./src/mycode/glsl/postprocessing/Bloom2.frag":
+/*!****************************************************!*\
+  !*** ./src/mycode/glsl/postprocessing/Bloom2.frag ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("precision highp float;\r\nprecision highp int;\r\n\r\n// uniform sampler2D _MainTex;\r\nuniform sampler2D tDiffuse;\r\nuniform vec4 _MainTex_TexelSize;\r\nuniform float _BlurSize;\r\n\r\nvarying vec4 vPos;\r\nvarying vec2 vUv[5];\r\n\r\nstruct v2f{\r\n    vec4 pos;\r\n    vec2 uv[9];\r\n};\r\n\r\n\r\n\r\nfloat luminance(vec4 color){\r\n    return 0.2125 * color.r + 0.7154 * color.g + 0.0721 * color.b;\r\n}\r\n\r\nvec4 liu(vec4 color){\r\n    float a = luminance(color) > 0.01 ? 1. : 0.;\r\n    return a > 0. ? color : vec4(0.);\r\n}\r\n\r\nvoid main() {\r\n\r\n    float weight[3];\r\n    weight[0] = 0.4026; weight[1] = 0.2442; weight[2] = 0.0545;\r\n\r\n    float num = weight[0];\r\n    vec3 sum = texture2D(tDiffuse, vUv[0]).rgb * weight[0];\r\n\r\n    for (int it = 1; it < 3; it++){\r\n        vec4 col = texture2D(tDiffuse, vUv[it*2-1]);\r\n        vec4 col2 = liu(col);\r\n        sum += col2.rgb * weight[it];\r\n        num += col2.a > 0. ? weight[it] : 0.;\r\n        \r\n        col = texture2D(tDiffuse, vUv[it*2]);\r\n        col2 = liu(col);\r\n        sum += col2.rgb * weight[it];\r\n        num += col2.a > 0. ? weight[it] : 0.;\r\n        //sum += vec3(texture2D(tDiffuse, vUv[it*2]).rgb * weight[it]);\r\n    }\r\n\r\n    gl_FragColor =  vec4(sum / num, 1.);\r\n\r\n    // vec4 col = texture2D(tDiffuse, vUv[0]);\r\n    // gl_FragColor = col;\r\n\r\n    // gl_FragColor = vec4(1.);\r\n    // gl_FragColor = withEdgeColor;    \r\n    // gl_FragColor = onlyEdgeColor;\r\n    // gl_FragColor = texture2D(tDiffuse, vUv[4]);\r\n}");
+
+/***/ }),
+
+/***/ "./src/mycode/glsl/postprocessing/Bloom2.vert":
+/*!****************************************************!*\
+  !*** ./src/mycode/glsl/postprocessing/Bloom2.vert ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("// #define coding 1;\r\n// #ifdef coding\r\n//     precision mediump float;\r\n\r\n//     uniform mat4 modelMatrix;\r\n//     uniform mat4 modelViewMatrix;\r\n//     uniform mat4 projectionMatrix;\r\n\r\n//     attribute vec3 position;\r\n//     attribute vec2 uv;\r\n// #endif\r\n\r\nuniform sampler2D tDiffuse;\r\nuniform vec4 _MainTex_TexelSize;\r\nuniform float _BlurSize;\r\n\r\nvarying vec4 vPos;\r\nvarying vec2 vUv[5];\r\n\r\nvoid main(){\r\n    vPos = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\r\n    gl_Position = vPos;\r\n\r\n    vUv[0] = uv;\r\n    vUv[1] = uv + _MainTex_TexelSize.xy * 1. * _BlurSize;\r\n    vUv[2] = uv - _MainTex_TexelSize.xy * 1. * _BlurSize;\r\n    vUv[3] = uv + _MainTex_TexelSize.xy * 2. * _BlurSize;\r\n    vUv[4] = uv - _MainTex_TexelSize.xy * 2. * _BlurSize;\r\n}");
+
+/***/ }),
+
+/***/ "./src/mycode/glsl/postprocessing/getHighLight.frag":
+/*!**********************************************************!*\
+  !*** ./src/mycode/glsl/postprocessing/getHighLight.frag ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("precision highp float;\r\nprecision highp int;\r\n\r\nuniform sampler2D tDiffuse;\r\nuniform float _Threshold;\r\n\r\nvarying vec4 vPos;\r\nvarying vec2 vUv;\r\n\r\nfloat luminance(vec4 color){\r\n    return 0.2125 * color.r + 0.7154 * color.g + 0.0721 * color.b;\r\n}\r\n\r\nvoid main() {\r\n    vec4 col = texture2D(tDiffuse, vUv);\r\n    col = luminance(col) > _Threshold ? col : vec4(0.);\r\n    gl_FragColor = col;\r\n}");
+
+/***/ }),
+
+/***/ "./src/mycode/glsl/postprocessing/getHighLight.vert":
+/*!**********************************************************!*\
+  !*** ./src/mycode/glsl/postprocessing/getHighLight.vert ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("varying vec2 vUv;\r\n\r\nvoid main() {\r\n\r\n    vUv = uv;\r\n    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\r\n\r\n}");
+
+/***/ }),
+
+/***/ "./src/mycode/glsl/postprocessing/mixBloom.frag":
+/*!******************************************************!*\
+  !*** ./src/mycode/glsl/postprocessing/mixBloom.frag ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("precision highp float;\r\nprecision highp int;\r\n\r\nuniform sampler2D tDiffuse;\r\nuniform sampler2D tDiffuse2;\r\n\r\nvarying vec2 vUv;\r\nfloat luminance(vec3 color){\r\n    return 0.2125 * color.r + 0.7154 * color.g + 0.0721 * color.b;\r\n}\r\nvoid main() {\r\n    vec4 tex1 = texture2D(tDiffuse, vUv);\r\n    vec4 tex2 = texture2D(tDiffuse2, vUv);\r\n    // vec3 col = mix(tex1.rgb, tex2.rgb, luminance(tex2));\r\n    // tex2 = luminance(tex2) > 1.01 ? vec4(1.,0.,0.,1.) : tex2;\r\n    vec3 col = tex1.rgb + tex2.rgb ;\r\n    col = (luminance(col) > 1.) ? (col / luminance(col)) : col;\r\n    gl_FragColor = vec4(col,1.);\r\n    // gl_FragColor = tex1;\r\n}");
+
+/***/ }),
+
+/***/ "./src/mycode/glsl/postprocessing/mixBloom.vert":
+/*!******************************************************!*\
+  !*** ./src/mycode/glsl/postprocessing/mixBloom.vert ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ("varying vec2 vUv;\r\n\r\nvoid main() {\r\n\r\n    vUv = uv;\r\n    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\r\n\r\n}");
+
+/***/ }),
+
 /***/ "./src/mycode/mylib/init_comtrast_three.modle.ts":
 /*!*******************************************************!*\
   !*** ./src/mycode/mylib/init_comtrast_three.modle.ts ***!
@@ -51548,9 +51626,9 @@ function log() {
 
 /***/ }),
 
-/***/ "./src/mycode/postprocessing/postprocessing_0RenderTarget.ts":
+/***/ "./src/mycode/postprocessing/coding_postprocessing_Bloom1.ts":
 /*!*******************************************************************!*\
-  !*** ./src/mycode/postprocessing/postprocessing_0RenderTarget.ts ***!
+  !*** ./src/mycode/postprocessing/coding_postprocessing_Bloom1.ts ***!
   \*******************************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -51558,52 +51636,171 @@ function log() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../mylib/init_comtrast_three.modle */ "./src/mycode/mylib/init_comtrast_three.modle.ts");
-// class
+/* harmony import */ var _glsl_postprocessing_Bloom2_vert__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../glsl/postprocessing/Bloom2.vert */ "./src/mycode/glsl/postprocessing/Bloom2.vert");
+/* harmony import */ var _glsl_postprocessing_Bloom2_frag__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../glsl/postprocessing/Bloom2.frag */ "./src/mycode/glsl/postprocessing/Bloom2.frag");
+/* harmony import */ var _glsl_postprocessing_getHighLight_vert__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../glsl/postprocessing/getHighLight.vert */ "./src/mycode/glsl/postprocessing/getHighLight.vert");
+/* harmony import */ var _glsl_postprocessing_getHighLight_frag__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../glsl/postprocessing/getHighLight.frag */ "./src/mycode/glsl/postprocessing/getHighLight.frag");
+/* harmony import */ var _glsl_postprocessing_mixBloom_vert__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../glsl/postprocessing/mixBloom.vert */ "./src/mycode/glsl/postprocessing/mixBloom.vert");
+/* harmony import */ var _glsl_postprocessing_mixBloom_frag__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../glsl/postprocessing/mixBloom.frag */ "./src/mycode/glsl/postprocessing/mixBloom.frag");
+
+
+
+
+
+
 
 var scene = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Scene();
-var camera = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 10000);
-var renderer = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].WebGLRenderer();
-var sceneA;
-renderer.setSize(window.innerWidth, window.innerHeight);
+var winWidth = window.innerWidth / 2, winHeight = window.innerHeight;
+var camera = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].OrthographicCamera(winWidth / -2, winWidth / 2, winHeight / 2, winHeight / -2, 1, 10000);
+var sceneA, hightLightScene, scenePlanes = Array(), mixScene;
 camera.position.z = 1000;
+var renderer = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].WebGLRenderer();
+renderer.setSize(winWidth, winHeight);
 document.body.appendChild(renderer.domElement);
-// SceneA 场景1 
-// 包括 scene, 物品, camera, WebGLRenderTarget (简称:fbo), 渲染方法(render)
+renderer.domElement.style.position = "fixed";
+renderer.domElement.style.top = "0";
+renderer.domElement.style.left = "0";
+var renderer2 = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].WebGLRenderer();
+renderer2.setSize(winWidth, winHeight);
+document.body.appendChild(renderer2.domElement);
+renderer2.domElement.style.position = "fixed";
+renderer2.domElement.style.top = "0";
+renderer2.domElement.style.right = "0";
+// 原场景,原相机
 var SceneA = /** @class */ (function () {
     function SceneA() {
+        this.cubeNum = 1000;
         this.scene = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Scene();
-        this.camera = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].PerspectiveCamera(60, 1., 0.1, 1000);
+        this.camera = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].PerspectiveCamera(60, winWidth / winHeight, 0.1, 1000);
         this.camera.position.z = 5;
-        this.cube = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Group();
-        this.cube.add(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Mesh(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].BoxGeometry(1, 1, 1), new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].MeshBasicMaterial({ color: 0xff0000 })));
-        this.cube.add(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].LineSegments(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].WireframeGeometry(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].BoxGeometry(1, 1, 1)), new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].LineBasicMaterial({ color: 0xffff00 })));
-        this.scene.add(this.cube);
+        this.createScene();
         var renderTargetParameters = { minFilter: _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].LinearFilter, magFilter: _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].LinearFilter, format: _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].RGBFormat, stencilBuffer: false };
-        this.fbo = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].WebGLRenderTarget(window.innerWidth, window.innerHeight, renderTargetParameters);
+        this.fbo = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].WebGLRenderTarget(winWidth, winHeight, renderTargetParameters);
         this.render = function () {
-            this.cube.rotation.x += 0.01;
-            this.cube.rotation.y += 0.01;
-            renderer.setClearColor(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Color(0xffffff));
+            // this.cube.rotation.x += 0.01;
+            // this.cube.rotation.y += 0.01;
             renderer.setRenderTarget(this.fbo);
+            renderer.clear();
+            renderer.render(this.scene, this.camera);
+            renderer2.render(this.scene, this.camera);
+        };
+    }
+    SceneA.prototype.createScene = function () {
+        this.group = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Group();
+        // this.cube.add(
+        //new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshBasicMaterial({color:0xffff00})));
+        // this.group.add(
+        //     new THREE.LineSegments(
+        //         new THREE.WireframeGeometry(new THREE.BoxGeometry(1,1,1)), 
+        //         new THREE.LineBasicMaterial({color: 0xffff00})
+        //     ));
+        for (var i = 0; i < this.cubeNum; i++) {
+            this.group.add(this.createCube());
+        }
+        this.scene.add(this.group);
+    };
+    ;
+    SceneA.prototype.createCube = function () {
+        var size = Math.random();
+        var color = parseInt(Math.random() * 0xffffff + "");
+        var position = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Vector3(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * 10 - 10);
+        var mesh = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Mesh(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].BoxGeometry(size, size, size), new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].MeshBasicMaterial({ color: color }));
+        mesh.position.set(position.x, position.y, position.z);
+        return mesh;
+    };
+    ;
+    return SceneA;
+}());
+// 进行多次泛光,模糊操作用的场景, 
+// 由于需要水平模糊和数值模糊, 在数组scenePlanes 中 下标偶数为水平模糊, 下标奇数垂直模糊
+var ScenePlane = /** @class */ (function () {
+    /**
+     * @param {THREE.WebGLRenderTarget} shaderMaterial
+     * @param {boolean} isLast : boolean 判断是否是最后一次渲染, 最后次渲染要渲染到屏幕上
+     */
+    function ScenePlane(shaderMaterial, isLast) {
+        isLast = isLast ? true : false;
+        this.scene = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Scene();
+        this.camera = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].OrthographicCamera(winWidth / -2, winWidth / 2, winHeight / 2, winHeight / -2, 1, 10000);
+        this.camera.position.z = 5;
+        this.plane = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Mesh(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].PlaneBufferGeometry(winWidth, winHeight), shaderMaterial);
+        this.scene.add(this.plane);
+        var renderTargetParameters = { minFilter: _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].LinearFilter, magFilter: _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].LinearFilter, format: _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].RGBFormat, stencilBuffer: false };
+        this.fbo = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].WebGLRenderTarget(winWidth, winHeight, renderTargetParameters);
+        this.render = function () {
+            if (isLast) {
+                renderer.setRenderTarget(null);
+            }
+            else {
+                renderer.setRenderTarget(this.fbo);
+            }
             renderer.clear();
             renderer.render(this.scene, this.camera);
         };
     }
-    return SceneA;
+    return ScenePlane;
 }());
+var getHighLightShaderMaterial = function (otherFbo) {
+    return new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].ShaderMaterial({
+        uniforms: {
+            "tDiffuse": { value: otherFbo.texture },
+            "_Threshold": { value: 0.5 },
+        },
+        vertexShader: _glsl_postprocessing_getHighLight_vert__WEBPACK_IMPORTED_MODULE_3__["default"],
+        fragmentShader: _glsl_postprocessing_getHighLight_frag__WEBPACK_IMPORTED_MODULE_4__["default"],
+        transparent: true
+    });
+};
+/**
+ *
+ * @param { THREE.WebGLRenderTarget } otherFbo
+ * @param { boolean } direction
+ */
+var bloomShaderMaterial = function (otherFbo, direction) {
+    return new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].ShaderMaterial({
+        uniforms: {
+            "tDiffuse": { value: otherFbo.texture },
+            "_MainTex_TexelSize": { value: direction ? new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Vector4(1 / winWidth, 0, 0., 0.) : new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Vector4(0, 1 / winHeight, 0., 0.) },
+            "_BlurSize": { value: 1.0 },
+        },
+        vertexShader: _glsl_postprocessing_Bloom2_vert__WEBPACK_IMPORTED_MODULE_1__["default"],
+        fragmentShader: _glsl_postprocessing_Bloom2_frag__WEBPACK_IMPORTED_MODULE_2__["default"],
+    });
+};
+var mixShaderMaterial = function (sourceFbo, bloomFbo) {
+    return new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].ShaderMaterial({
+        uniforms: {
+            "tDiffuse": { value: sourceFbo.texture },
+            "tDiffuse2": { value: bloomFbo.texture },
+        },
+        vertexShader: _glsl_postprocessing_mixBloom_vert__WEBPACK_IMPORTED_MODULE_5__["default"],
+        fragmentShader: _glsl_postprocessing_mixBloom_frag__WEBPACK_IMPORTED_MODULE_6__["default"],
+    });
+};
 function init() {
+    var renderNum = 20; // 渲染次数
+    var fbo; // 类似于迭代器, 存储上一次渲染到哪个 fbo了
     sceneA = new SceneA();
-    var cube = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Mesh(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].BoxGeometry(100, 100, 100), new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].MeshBasicMaterial({ color: 0xffffff, map: sceneA.fbo.texture }));
-    scene.add(cube);
-    var control = new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["OrbitControls"](camera, renderer.domElement);
+    // hightLightScene = new ScenePlane(getHighLightShaderMaterial(sceneA.fbo));
+    hightLightScene = new ScenePlane(getHighLightShaderMaterial(sceneA.fbo));
+    fbo = hightLightScene.fbo;
+    for (var i = 0; i <= renderNum; i++) {
+        var direction = (i % 2 == 0);
+        var bloomScene = new ScenePlane(bloomShaderMaterial(fbo, direction));
+        fbo = bloomScene.fbo;
+        scenePlanes.push(bloomScene);
+    }
+    mixScene = new ScenePlane(mixShaderMaterial(sceneA.fbo, fbo), true); // 混合原图和高光模糊图
+    new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["OrbitControls"](sceneA.camera, renderer.domElement);
 }
 function animate() {
     requestAnimationFrame(animate);
     sceneA.render();
-    renderer.setRenderTarget(null);
-    renderer.setClearColor(new _mylib_init_comtrast_three_modle__WEBPACK_IMPORTED_MODULE_0__["THREE"].Color(0x000000));
-    renderer.clear();
-    renderer.render(scene, camera);
+    hightLightScene.render();
+    for (var i = 0; i < scenePlanes.length; i++) {
+        scenePlanes[i].render();
+    }
+    mixScene.render();
 }
 init();
 animate();
@@ -51612,4 +51809,4 @@ animate();
 /***/ })
 
 /******/ });
-//# sourceMappingURL=postprocessing_0RenderTarget.js.map
+//# sourceMappingURL=coding_postprocessing_Bloom1.js.map

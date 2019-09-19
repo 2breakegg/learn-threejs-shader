@@ -16,6 +16,7 @@ var files = {
         "meshlight_Phong"
     ],
     "postprocessing/": [
+        "coding_postprocessing_Bloom1",
         "postprocessing_0RenderTarget",
         "postprocessing_Bloom0",
         "postprocessing_brightnessSaturationContrast",

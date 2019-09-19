@@ -1,18 +1,18 @@
 {
-    "files.exclude": {
-        ".gitignore": true,
-        "dist": true,
-        "for_webpack": true,
-        "node_modules": true,
-        "package-lock.json": true,
-        "package.json": false,
-        "readme.md": true,
-        "test": true,
-        "tsconfig.json": true,
-        "webGL": true,
-        "webpack.config.js": true,
-        ".vscode": true
-    },
+    // "files.exclude": {
+    //     ".gitignore": true,
+    //     "dist": true,
+    //     "for_webpack": true,
+    //     "node_modules": true,
+    //     "package-lock.json": true,
+    //     "package.json": false,
+    //     "readme.md": true,
+    //     "test": true,
+    //     "tsconfig.json": true,
+    //     "webGL": true,
+    //     "webpack.config.js": true,
+    //     ".vscode": true
+    // },
 
     "workbench.colorTheme": "Red"
 
